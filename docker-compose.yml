@@ -1,0 +1,29 @@
+version: '3'
+
+networks:
+  postgres_network:
+    driver: bridge
+
+services:
+  integration:
+    build:
+      context: .
+      dockerfile: integration.Dockerfile
+    networks:
+      - postgres_network
+
+  postgres1:
+    hostname: postgres1
+    networks:
+      - postgres_network
+    image: postgres:11.1
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: defaultdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.db/postgres1:/var/lib/postgresql/dat
+      - ./queries/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    restart: "unless-stopped"
